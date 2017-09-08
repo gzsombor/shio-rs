@@ -4,7 +4,7 @@ lto = true
 [workspace]
 members = [
   "lib/",
-  "shio-macro",
+  "macros/",
   "examples/hello",
   "examples/json",
   "examples/proxy",
@@ -14,5 +14,5 @@ members = [
   "examples/postgres",
   "examples/managed_state",
   "examples/mysql",
-  "examples/hello_macro",
+  "examples/hello_macros",
 ]
