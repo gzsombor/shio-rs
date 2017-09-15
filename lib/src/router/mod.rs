@@ -125,7 +125,6 @@ impl Handler for Router {
 #[cfg(test)]
 mod tests {
     use tokio_core::reactor::Core;
-    use hyper;
 
     use super::{Parameters, Router};
     use {Context, Handler, Response, State};
@@ -206,12 +205,9 @@ mod tests {
         }));
 
         let mut core = Core::new().unwrap();
-
-        // TODO: It should much easier to make a test context
-        //       Perhaps `Request::build ( .. )` should be a thing?
-        //       Proxied as `Context::build ( .. )` ?
-        let (request, data) = ::service::from_hyper_request(hyper::Request::new(hyper::Method::Get, "/user/3289".parse().unwrap()));
-        let context = Context::new(core.handle(), request, State::default(), data);
+        let context = Context::builder(core.handle())
+            .uri("/user/3289")
+            .finalize().unwrap();
 
         let work = router.call(context);
 
@@ -245,9 +241,9 @@ mod tests {
         }));
 
         let mut core = Core::new().unwrap();
-
-        let (request, data) = ::service::from_hyper_request(hyper::Request::new(hyper::Method::Get, "/static/path/to/file/is/here".parse().unwrap()));
-        let context = Context::new(core.handle(), request, State::default(), data);
+        let context = Context::builder(core.handle())
+            .uri("/static/path/to/file/is/here")
+            .finalize().unwrap();
 
         let work = router.call(context);
 
