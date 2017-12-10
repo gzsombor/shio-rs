@@ -7,17 +7,21 @@
 //  - Use `Shio::new( .. )` as the router is just getting in the way here
 //  - Proxy full request path
 
-extern crate hyper;
-extern crate shio;
 extern crate clap;
+extern crate hyper;
+#[macro_use]
+extern crate log;
+extern crate shio;
+extern crate simple_logger;
 
-use shio::prelude::*;
 use hyper::Client;
 use clap::{App, Arg};
+use shio::prelude::*;
 
 fn proxy(ctx: Context) -> BoxFuture<Response, hyper::Error> {
     // Additional work can be scheduled on the thread-local event loop,
     // as each handler receives a reference to it
+    info!("Initialising new proxy request.");
     Client::new(ctx.handle())
         .get("http://www.google.com".parse().unwrap())
         // Map the _streaming_ response from google into a _streaming_
@@ -32,13 +36,16 @@ fn proxy(ctx: Context) -> BoxFuture<Response, hyper::Error> {
 }
 
 fn main() {
+    simple_logger::init_with_level(log::LogLevel::Info).unwrap();
     let matches = App::new("Proxy")
-                    .version(env!("CARGO_PKG_VERSION"))
-                    .arg(Arg::with_name("port")
-                        .short("p")
-                        .value_name("PORT")
-                        .help("Sets port number"))
-                    .get_matches();
+        .version(env!("CARGO_PKG_VERSION"))
+        .arg(
+            Arg::with_name("port")
+                .short("p")
+                .value_name("PORT")
+                .help("Sets port number"),
+        )
+        .get_matches();
     let port = matches.value_of("port").unwrap_or("7878");
     // Our simple HTTP proxy doesn't need a Router and Shio doesn't force
     // a router on you.
@@ -47,6 +54,7 @@ fn main() {
     // is a (wrapped) Router. As we don't need a router, we are using
     // `Shio::new` to specify our own root handler.
 
+    info!("Initialising proxy on port {}.", port);
     Shio::new(proxy).run(format!(":{}", port)).unwrap();
 
     // Here is an example of what `Shio::default` is equivalent to:
@@ -60,5 +68,4 @@ fn main() {
         .with(shio::middleware::Recover)
     )
 
-    */
-}
+    */}
