@@ -4,7 +4,6 @@ extern crate serde;
 extern crate serde_json;
 extern crate shio;
 
-#[macro_use]
 extern crate mysql_async as my;
 
 extern crate uuid;
@@ -27,8 +26,6 @@ mod errors {
         }
     }
 }
-
-use errors::*;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 struct User {
