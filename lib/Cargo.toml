@@ -11,12 +11,12 @@ keywords = ["shio", "web", "framework", "async", "server"]
 categories = ["asynchronous", "web-programming::http-server"]
 
 [dependencies]
-futures = "0.1.14"
-tokio-core = "0.1.9"
+futures = "0.1.17"
+tokio-core = "0.1.10"
 net2 = "0.2.31"
-num_cpus = "1.6.2"
+num_cpus = "1.7.0"
 hyper = "0.11"
-tokio-proto = "0.1.1"
+tokio-proto = "0.1"
 regex = "0.2"
 log = "0.3"
 unsafe-any = "0.4.2"
