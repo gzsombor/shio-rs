@@ -6,6 +6,7 @@ workspace = "../.."
 [dependencies]
 shio = { path = "../../lib" }
 hyper = "0.11"
+hyper-tls = "0.1.2"
 clap = "2.29"
 log = "0.3"
 simple_logger = "0.4"

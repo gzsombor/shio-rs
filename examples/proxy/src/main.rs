@@ -9,6 +9,7 @@
 
 extern crate clap;
 extern crate hyper;
+extern crate hyper_tls;
 #[macro_use]
 extern crate log;
 extern crate shio;
@@ -22,8 +23,10 @@ fn proxy(ctx: Context) -> BoxFuture<Response, hyper::Error> {
     // Additional work can be scheduled on the thread-local event loop,
     // as each handler receives a reference to it
     info!("Initialising new proxy request.");
-    Client::new(ctx.handle())
-        .get("http://www.google.com".parse().unwrap())
+    Client::configure()
+        .connector(hyper_tls::HttpsConnector::new(4, &ctx.handle()).unwrap())
+        .build(&ctx.handle())
+        .get("https://www.google.com".parse().unwrap())
         // Map the _streaming_ response from google into a _streaming_
         // response from us
         .map(|res| Response::build().body(res.body()))
