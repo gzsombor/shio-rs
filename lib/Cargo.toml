@@ -22,7 +22,9 @@ log = "0.3"
 unsafe-any = "0.4.2"
 http = "0.1"
 
+shio_macros = { path="../macros", optional=true }
+
 [features]
 default = []
-nightly = []
+nightly = ["shio_macros"]
 wsl = []

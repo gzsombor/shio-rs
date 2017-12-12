@@ -83,7 +83,7 @@ impl<T: Key> FromState for T
 where
     <T as Key>::Value: Send + Sync,
 {
-    default fn from_state(state: &State) -> &<T as Key>::Value {
+    default fn from_state(state: &State) -> Option<&Self::Value> {
         state
             .shared
             .try_get::<T>()
@@ -130,7 +130,7 @@ mod tests {
     #[cfg(feature = "nightly")]
     fn test_state_shared_fallback() {
         let mut shared = TypeMap::<UnsafeAny + Send + Sync>::custom();
-        shared.insert::<Number>(7878);
+        shared.put::<Number>(7878);
 
         let state = State::new(Arc::new(shared));
 
