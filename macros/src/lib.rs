@@ -8,7 +8,7 @@ extern crate syn;
 
 use proc_macro::TokenStream;
 use syn::FnArg::{Ignored, Captured};
-use syn::{Ident, Ty, Pat, Path};
+use syn::{Ty, Pat};
 use quote::{Tokens, ToTokens};
 
 #[proc_macro_attribute]
@@ -133,17 +133,22 @@ impl Route {
                         };
                         let param_type = match ty {
                             &Ty::Path(_, ref path) => quote::Ident::from(path.segments[0].ident.as_ref()),
+                            &Ty::Rptr(_, ref mutTy) => match &mutTy.ty {
+                                &Ty::Path(_, ref path) => quote::Ident::from(path.segments[0].ident.as_ref()),
+                                _ => panic!("Unexpected captured parameter type {:?}", ty)
+                            }
                             _ => panic!("Unexpected captured parameter type {:?}", ty)
                         };
                         let mv = MultiVariable { index: current };
+                        let acquire_method = self.create_acquire_method(&param_name, &param_type);
                         result.append(quote!{
-                            let #mv = ctx.acquire_by_name::<#param_type> ( #param_name );
+                            let #mv = #acquire_method;
                         });
 
                         params.push(mv);
                         current+=1;
                     }
-                    &Ignored(ref ty) => {
+                    &Ignored(ref _ty) => {
                         let mv = MultiVariable { index: current };
                         params.push(mv);
                         current+=1;
@@ -157,6 +162,15 @@ impl Route {
             result
         } else {
             panic!("Never happen!");
+        }
+    }
+
+    fn create_acquire_method(&self, param_name: &Option<&str>, param_type: &quote::Ident) -> quote::Tokens {
+        match param_type.as_ref() {
+            "Context" => quote!{ &ctx },
+            "str" => quote!{ &ctx.get::<Parameters>()[#param_name] },
+            "String" => quote!{ &ctx.get::<Parameters>()[#param_name].to_string() },
+            _ => panic!("Unexpected param type: {:?}", param_type)
         }
     }
 }
