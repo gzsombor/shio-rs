@@ -10,15 +10,28 @@ fn hello_world(_: Context) -> Response {
     Response::with("Hello World!\n")
 }
 
-#[get("/{name}")]
+#[get("/hello/{name}")]
 fn hello(ctx: Context) -> Response {
     Response::with(format!("Hello, {}!", &ctx.get::<Parameters>()["name"]))
 }
+
+#[get("/bye/{name}")]
+fn bye(name: String) -> Response {
+    Response::with(format!("Bye, {}!", name))
+}
+
+#[get("/converse/{say}")]
+fn converse(ctx: Context, say: String) -> Response {
+    Response::with(format!("Bye, {}!", name))
+}
+
+
 
 fn main() {
     Shio::default()
         .route(hello_world)
         .route(hello)
+        .route(bye)
         .run(":7878")
         .unwrap();
 }
